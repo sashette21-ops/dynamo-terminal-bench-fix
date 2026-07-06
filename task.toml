@@ -1,0 +1,24 @@
+artifacts = ["report.json"]
+
+[task]
+name = "dynamo/log-report"
+description = "Analyze the provided access.log file and write an exact JSON summary report."
+
+[verifier]
+timeout_sec = 30
+
+[metadata]
+category = "software_engineering"
+subcategory = "debugging"
+task_objective = "Create a JSON report from an access log with exact request, status, endpoint, and latency metrics."
+artifact_type = "json"
+expert_time_estimate_hours = 1.0
+model_tested = "gpt-4.1"
+agent_tested = "terminal-bench-agent"
+difficulty_explanation = "The task requires parsing a log file, computing exact aggregate metrics, and producing strict JSON output that matches a verifier."
+solution_explanation = "The solution parses access.log line by line, extracts HTTP method, endpoint, status code, and latency, then writes report.json with total requests, status counts, top endpoint, and average latency."
+verification_explanation = "The verifier checks that report.json exists, is valid JSON, and exactly matches the expected values computed independently from the provided access.log."
+
+[environment]
+allow_internet = false
+mcp_servers = []
