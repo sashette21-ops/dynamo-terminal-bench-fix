@@ -1,30 +1,42 @@
 # Dynamo Log Report
 
-You are given an access log at:
+You are given an Apache-style access log at:
 
 `/app/access.log`
 
-Create a JSON file at:
+Create a JSON report at:
 
 `/app/report.json`
 
-The JSON file must contain exactly these top-level keys:
+The report must be valid JSON and must contain exactly these top-level keys:
 
 ```json
 {
   "total_requests": 0,
+  "unique_ips": 0,
   "status_counts": {},
-  "top_endpoint": "",
-  "average_latency_ms": 0.0
+  "path_counts": {},
+  "top_path": ""
 }
 ```
 
+## Parsing rules
+
+Each non-empty line in `/app/access.log` is one request.
+
+For each request:
+
+- The client IP address is the first whitespace-separated field.
+- The request path is the path inside the quoted HTTP request, for example `/index.html` from `"GET /index.html HTTP/1.1"`.
+- The HTTP status code is the three-digit status code after the quoted HTTP request.
+
 ## Success criteria
 
-1. Create `/app/report.json` as valid JSON.
-2. `total_requests` must equal the number of parsed request log entries in `/app/access.log`.
-3. `status_counts` must be an object whose keys are HTTP status codes as strings and whose values are exact counts.
-4. `top_endpoint` must be the endpoint path that appears most often. If there is a tie, choose the alphabetically first endpoint.
-5. `average_latency_ms` must be the arithmetic mean of all parsed request latencies in milliseconds, rounded to exactly 2 decimal places.
+1. Create `/app/report.json` as valid JSON with exactly the keys `total_requests`, `unique_ips`, `status_counts`, `path_counts`, and `top_path`.
+2. `total_requests` must equal the number of non-empty request lines in `/app/access.log`.
+3. `unique_ips` must equal the number of distinct client IP addresses in `/app/access.log`.
+4. `status_counts` must be an object whose keys are HTTP status codes as strings and whose values are exact request counts.
+5. `path_counts` must be an object whose keys are request paths and whose values are exact request counts.
+6. `top_path` must be the request path with the highest count. If two or more paths tie, choose the alphabetically first path.
 
-Do not use the internet. Do not write the answer anywhere except `/app/report.json`.
+Do not use the internet. Do not write the final answer anywhere except `/app/report.json`.

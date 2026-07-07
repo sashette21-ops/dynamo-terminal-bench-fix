@@ -1,44 +1,31 @@
-# Dynamo Terminal-Bench Fix
+# Dynamo Log Report — Fixed Harbor Task
 
-This repository contains a corrected Harbor Terminal-Bench 2 task for `dynamo/log-report`.
+This repository contains the repaired Terminal-Bench 2 / Harbor task for `dynamo/log-report`.
 
 ## What was fixed
 
-### Format
-`task.toml` was corrected so `artifacts` is a top-level array, not a string. The task, verifier, metadata, and environment sections follow the required Harbor structure.
+- `task.toml`: changed `artifacts` from a string to a top-level array and pointed it to `/app/report.json`; normalized metadata fields to scalar lowercase snake_case values; removed non-template fields; disabled internet.
+- `environment/Dockerfile`: replaced `python:latest` with a pinned digest image and removed the leaked `solution_hint.py` from the agent image.
+- `tests/test_outputs.py`: replaced existence-only checks with value checks that independently parse `/app/access.log`.
+- `tests/test.sh`: runs plain pytest without verify-time installs, writes `/app/reward.txt`, and emits `/app/ctrf.json`.
+- `instruction.md`: rewrote the instructions so each success criterion maps one-to-one to a verifier test.
+- `solution/solve.py`: fixed the oracle to produce the exact JSON schema and values required by the instructions.
 
-### Environment
-The Dockerfile uses one environment image and installs verifier dependencies during the image build. The reference solution is not copied into the agent image. Replace `REPLACE_WITH_APPROVED_PINNED_DIGEST` with the approved pinned `sha256` digest required by your Harbor environment.
+## Expected outputs for the included access.log
 
-### Verifier
-The original verifier was gameable because it only checked whether an output file existed. The corrected verifier parses `access.log` independently and checks each required value exactly.
-
-### Instruction
-`instruction.md` now has five clear success criteria. The verifier has exactly one test per criterion and no extra checks.
-
-## Files
-
-```text
-dynamo-terminal-bench-fix/
-├── README.md
-├── task.toml
-├── instruction.md
-├── access.log
-├── environment/
-│   └── Dockerfile
-├── solution/
-│   └── solve.sh
-└── tests/
-    ├── test.sh
-    └── test_outputs.py
+```json
+{
+  "path_counts": {
+    "/about.html": 2,
+    "/api/login": 1,
+    "/index.html": 3
+  },
+  "status_counts": {
+    "200": 5,
+    "401": 1
+  },
+  "top_path": "/index.html",
+  "total_requests": 6,
+  "unique_ips": 3
+}
 ```
-
-## Expected verifier behavior
-
-- Oracle solution should produce `reward.txt = 1`.
-- Nop agent should produce `reward.txt = 0`.
-- A bugged solution with an incorrect count should produce `reward.txt = 0`.
-
-## Note
-
-Before final submission, run the task in your Terminal-Bench environment and paste the real `reward.txt` and `ctrf.json` summaries from your machine.

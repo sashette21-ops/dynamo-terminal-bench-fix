@@ -1,23 +1,23 @@
-artifacts = ["report.json"]
+artifacts = ["/app/report.json"]
 
 [task]
 name = "dynamo/log-report"
-description = "Analyze the provided access.log file and write an exact JSON summary report."
+description = "Parse an Apache-style access log and write a deterministic JSON summary report."
 
 [verifier]
 timeout_sec = 30
 
 [metadata]
-category = "software_engineering"
-subcategory = "debugging"
-task_objective = "Create a JSON report from an access log with exact request, status, endpoint, and latency metrics."
+category = "data_processing_and_etl"
+subcategory = "text_processing"
+task_objective = "parse_access_log_and_generate_json_summary"
 artifact_type = "json"
-expert_time_estimate_hours = 1.0
-model_tested = "gpt-4.1"
-agent_tested = "terminal-bench-agent"
-difficulty_explanation = "The task requires parsing a log file, computing exact aggregate metrics, and producing strict JSON output that matches a verifier."
-solution_explanation = "The solution parses access.log line by line, extracts HTTP method, endpoint, status code, and latency, then writes report.json with total requests, status counts, top endpoint, and average latency."
-verification_explanation = "The verifier checks that report.json exists, is valid JSON, and exactly matches the expected values computed independently from the provided access.log."
+expert_time_estimate_hours = 0.5
+model_tested = "gpt-5.4"
+agent_tested = "terminus-2"
+difficulty_explanation = "The task is small but requires exact parsing, deterministic tie-breaking, strict JSON output, and a verifier that checks values instead of file existence."
+solution_explanation = "The oracle reads /app/access.log, counts non-empty request lines, unique client IPs, HTTP status codes, and requested paths, then writes /app/report.json with exact deterministic fields."
+verification_explanation = "The verifier independently parses /app/access.log and checks one instruction success criterion per pytest test: valid JSON artifact, total request count, unique client count, exact status counts, exact path counts, and deterministic top path."
 
 [environment]
 allow_internet = false
